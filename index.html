@@ -140,14 +140,27 @@
     </div>
 
     <script>
-        // Proxys resilientes
-        const proxys = [
-            'https://corsproxy.io/?',
-            'https://api.allorigins.win/raw?url=',
-            'https://api.codetabs.com/v1/proxy?quest='
-        ];
-
         async function fetchResiliente(url) {
+            // Intento 1: "Modo Seguro" (Envuelto en JSON) - El más efectivo contra el firewall de Cloudflare
+            try {
+                const proxySeguro = 'https://api.allorigins.win/get?url=';
+                const res = await fetch(proxySeguro + encodeURIComponent(url));
+                if (res.ok) {
+                    const datosProxy = await res.json();
+                    if (datosProxy.contents) {
+                        return JSON.parse(datosProxy.contents);
+                    }
+                }
+            } catch (e) {
+                console.warn("Falló el Modo Seguro. Intentando proxies alternativos...");
+            }
+
+            // Intento 2 y 3: Proxys crudos de emergencia
+            const proxys = [
+                'https://corsproxy.io/?',
+                'https://api.codetabs.com/v1/proxy?quest='
+            ];
+
             for (let proxy of proxys) {
                 try {
                     const urlFinal = proxy.includes('corsproxy.io') ? proxy + url : proxy + encodeURIComponent(url);
@@ -156,9 +169,11 @@
                         const datos = await respuesta.json();
                         if (datos && !datos.error) return datos;
                     }
-                } catch (e) { console.warn(`Falló ${proxy}`); }
+                } catch (e) { 
+                    console.warn(`Falló proxy alternativo: ${proxy}`); 
+                }
             }
-            throw new Error("Todos los proxys fallaron.");
+            throw new Error("Todos los servidores proxy están caídos o bloqueados.");
         }
 
         async function buscarGranja() {
@@ -192,14 +207,17 @@
                 document.getElementById('g-nft').innerText = `NFT ID: #${datosId.nft_id}`;
                 document.getElementById('g-lvl').innerText = datos.bumpkin?.level || '0';
                 document.getElementById('g-exp').innerText = datos.land?.level || '0';
-                document.getElementById('g-isla').innerText = datos.land?.type || 'N/A';
+                
+                // Formatear tipo de isla
+                const tipoIsla = datos.land?.type ? datos.land.type.charAt(0).toUpperCase() + datos.land.type.slice(1) + ' Island' : 'N/A';
+                document.getElementById('g-isla').innerText = tipoIsla;
+                
                 document.getElementById('g-faccion').innerText = datos.faction?.name || 'Ninguna';
 
                 // Balances Dinámicos
                 let balHTML = '';
                 if(datos.balance) {
                     for(let moneda in datos.balance) {
-                        // Redondeamos para que se vea limpio
                         let valor = Math.floor(datos.balance[moneda]);
                         balHTML += `<div class="item-row">
                                         <span class="text-capitalize">${moneda.replace('_', ' ')}</span>
@@ -213,14 +231,12 @@
                 let invHTML = '';
                 let contadorItems = 0;
                 if(datos.inventory) {
-                    // Ordenamos el inventario alfabéticamente
                     const itemsOrdenados = Object.keys(datos.inventory).sort();
                     
                     for(let item of itemsOrdenados) {
                         let cantidad = Math.floor(datos.inventory[item]);
                         if(cantidad > 0) {
                             contadorItems++;
-                            // Agrupamos en 2 columnas pequeñas para aprovechar el espacio del centro
                             invHTML += `<div class="col-12 col-md-6">
                                             <div class="item-row">
                                                 <span class="text-light">${item}</span>
