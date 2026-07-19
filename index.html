@@ -3,63 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Utilidades SFL</title>
+    <title>Utilidades SFL - Reny</title>
     <style>
-        body { background-color: #121212; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; max-width: 800px; margin: auto; }
+        body { 
+            background-color: #121212; 
+            color: #e0e0e0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            padding: 20px; 
+            max-width: 800px; 
+            margin: auto; 
+        }
         h1 { color: #facc15; }
-        .card { background: #1e1e1e; padding: 20px; margin-bottom: 20px; border-radius: 10px; border: 1px solid #333; }
-        input, button { padding: 10px; margin-top: 10px; border-radius: 5px; border: none; }
-        input { background: #333; color: white; }
+        .card { 
+            background: #1e1e1e; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            border-radius: 10px; 
+            border: 1px solid #333; 
+        }
+        input, button { 
+            padding: 10px; 
+            margin-top: 10px; 
+            border-radius: 5px; 
+            border: none; 
+        }
+        input { background: #333; color: white; width: 60%; max-width: 250px;}
         button { background: #facc15; color: #121212; font-weight: bold; cursor: pointer; }
         button:hover { background: #eab308; }
         .data-text { font-size: 1.2em; margin-top: 10px; color: #4ade80; }
+        .lista-balance { list-style: none; padding: 0; }
+        .lista-balance li { margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
     <h1>Tablero de Estadísticas SFL</h1>
 
+    <!-- Panel de Economía -->
     <div class="card">
         <h2>💰 Economía</h2>
         <p>Precio del SFL (Exchange API):</p>
-        <div id="precio-sfl" class="data-text">Cargando mercado...</div>
+        <div id="precio-sfl" class="data-text">Conectando con el mercado...</div>
     </div>
 
+    <!-- Panel de Búsqueda de Granja -->
     <div class="card">
         <h2>🚜 Buscar Granja</h2>
         <p>Ingresa el Farm ID para ver la información:</p>
         <input type="number" id="farm-id" placeholder="Ejemplo: 8749547546587388">
         <button onclick="buscarGranja()">Consultar</button>
+        
         <div id="info-granja" class="data-text"></div>
         
+        <!-- Detalles de la granja (Se muestran tras la búsqueda) -->
         <div id="detalles-granja" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #333; color: #e0e0e0;">
             <p><strong>Nivel del Bumpkin:</strong> <span id="lvl-bumpkin"></span></p>
             <p><strong>Expansión Nº:</strong> <span id="expansion-granja"></span></p>
             <p><strong>Isla:</strong> <span id="isla-granja"></span></p>
             <p><strong>Balance:</strong></p>
-            <ul>
+            <ul class="lista-balance">
                 <li>🪙 <span id="monedas-granja"></span> Coins</li>
                 <li>💎 <span id="gemas-granja"></span> Gems</li>
             </ul>
             <p style="color: #facc15; font-style: italic; margin-top: 15px;">
-                ¡Únete a Sunflower Land, visita las granjas de la comunidad y ayuda a limpiarlas!
+                ¡Visita esta granja para limpiarla y apoyar a la comunidad!
             </p>
         </div>
     </div>
 
     <script>
+        // Proxy para saltar el bloqueo CORS de los navegadores
+        const proxy = 'https://api.allorigins.win/raw?url=';
+
+        // 1. Obtener precio del SFL
         async function obtenerPrecios() {
             try {
-                const respuesta = await fetch('https://sfl.world/api/v1.1/exchange');
+                const url = 'https://sfl.world/api/v1.1/exchange';
+                const respuesta = await fetch(proxy + encodeURIComponent(url));
+                
+                if (!respuesta.ok) throw new Error("Error en la respuesta del proxy");
+                
                 const datos = await respuesta.json();
                 document.getElementById('precio-sfl').innerText = `1 SFL = $${datos.sfl.usd}`;
             } catch (error) {
-                console.error("Fallo al traer el precio", error);
+                console.error("Fallo al traer el precio:", error);
                 document.getElementById('precio-sfl').innerText = 'Error al conectar con SFL.world';
                 document.getElementById('precio-sfl').style.color = '#f87171';
             }
         }
 
+        // 2. Buscar datos de la granja por ID
         async function buscarGranja() {
             const id = document.getElementById('farm-id').value;
             const cuadroTexto = document.getElementById('info-granja');
@@ -77,21 +110,25 @@
             cajaDetalles.style.display = 'none';
 
             try {
-                // PASO 1: Usamos la API de conversión para obtener el NFT ID
-                const resId = await fetch(`https://sfl.world/api/v1/land/info/farm_id/${id}`);
+                // PASO 1: Conseguir el NFT ID usando el Farm ID (pasando por el proxy)
+                const urlId = `https://sfl.world/api/v1/land/info/farm_id/${id}`;
+                const resId = await fetch(proxy + encodeURIComponent(urlId));
+                
                 if (!resId.ok) throw new Error("ID inválido o no registrado");
                 const datosId = await resId.json();
                 
                 cuadroTexto.innerText = `Paso 2: Descargando datos de ${datosId.username}...`;
                 
-                // PASO 2: Usamos el NFT ID para pedir los detalles reales de la granja
-                const resDetalles = await fetch(`https://sfl.world/api/v1.1/land/${datosId.nft_id}`);
+                // PASO 2: Conseguir los balances y niveles usando el NFT ID (pasando por el proxy)
+                const urlDetalles = `https://sfl.world/api/v1.1/land/${datosId.nft_id}`;
+                const resDetalles = await fetch(proxy + encodeURIComponent(urlDetalles));
+                
                 if (!resDetalles.ok) throw new Error("No se pudieron cargar los detalles");
                 const datos = await resDetalles.json();
 
-                console.log("Datos completos recibidos:", datos); // Revisa esto en la consola (F12)
+                console.log("Datos recibidos a través del proxy:", datos);
 
-                // Llenamos el HTML asegurándonos de que no falle si un dato está vacío (?)
+                // Llenar los datos en el HTML
                 document.getElementById('lvl-bumpkin').innerText = datos.bumpkinLevel || 'N/A';
                 document.getElementById('expansion-granja').innerText = datos.expansion || 'N/A';
                 document.getElementById('isla-granja').innerText = datos.island || 'N/A';
@@ -99,18 +136,20 @@
                 document.getElementById('monedas-granja').innerText = datos.balance?.coins || '0';
                 document.getElementById('gemas-granja').innerText = datos.balance?.gem || '0';
 
+                // Mostrar éxito y desplegar el cuadro
                 cuadroTexto.innerText = `Dueño: ${datosId.username} (NFT #${datosId.nft_id})`;
                 cuadroTexto.style.color = '#4ade80';
                 cajaDetalles.style.display = 'block';
 
             } catch (error) {
-                console.error("Error detectado:", error);
-                cuadroTexto.innerText = `Error de conexión. Revisa la consola (F12).`;
+                console.error("Error detectado en la consulta:", error);
+                cuadroTexto.innerText = `Error de conexión. Asegúrate de usar un ID válido.`;
                 cuadroTexto.style.color = '#f87171';
                 cajaDetalles.style.display = 'none';
             }
         }
 
+        // Auto-ejecutar el precio al cargar la página
         obtenerPrecios();
     </script>
 </body>
