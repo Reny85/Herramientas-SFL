@@ -1,134 +1,112 @@
 <!DOCTYPE html>
-<html lang="es-419" data-bs-theme="dark">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Herramientas SFL - Panel de Control</title>
-    
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    
+    <title>Utilidades SFL - Reny</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .card { transition: transform 0.2s ease-in-out, box-shadow 0.2s; }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; }
+        /* Estilos básicos para que se vea como un tablero oscuro y moderno */
+        body { 
+            background-color: #121212; 
+            color: #e0e0e0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            padding: 20px; 
+            max-width: 800px;
+            margin: auto;
+        }
+        h1 { color: #facc15; } /* Amarillo Sunflower */
+        .card { 
+            background: #1e1e1e; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            border-radius: 10px; 
+            border: 1px solid #333;
+        }
+        input, button { 
+            padding: 10px; 
+            margin-top: 10px; 
+            border-radius: 5px;
+            border: none;
+        }
+        input { background: #333; color: white; }
+        button { background: #facc15; color: #121212; font-weight: bold; cursor: pointer; }
+        button:hover { background: #eab308; }
+        .data-text { font-size: 1.2em; margin-top: 10px; color: #4ade80; } /* Verde para números */
     </style>
 </head>
 <body>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm sticky-top">
-        <div class="container">
-            <a class="navbar-brand text-success fw-bold" href="#">
-                <i class="bi bi-brightness-alt-high-fill"></i> SFL Tools
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link active" href="#">Inicio</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Mercado</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Estadísticas</a></li>
-                </ul>
-                <button id="btnSwitch" class="btn btn-outline-secondary rounded-circle">
-                    <i class="bi bi-moon-fill"></i>
-                </button>
-            </div>
-        </div>
-    </nav>
+    <h1>Tablero de Estadísticas SFL</h1>
 
-    <!-- Hero -->
-    <div class="container mt-5 text-center">
-        <h1 class="display-4 fw-bold">Herramientas para Sunflower Land</h1>
-        <p class="lead text-muted">Consulta precios, analiza recursos y optimiza tu estrategia Web3.</p>
-        
-        <div class="row justify-content-center mt-4">
-            <div class="col-md-6 col-sm-10">
-                <div class="input-group input-group-lg shadow-sm">
-                    <span class="input-group-text bg-success text-white">#</span>
-                    <input type="number" id="land_id" class="form-control" value="260259" placeholder="ID de la Granja">
-                    <button class="btn btn-success" type="button" onclick="go()">Revisar</button>
-                </div>
-            </div>
-        </div>
+    <!-- Bloque 1: Precio del Token -->
+    <div class="card">
+        <h2>💰 Economía</h2>
+        <p>Precio del SFL (Exchange API):</p>
+        <div id="precio-sfl" class="data-text">Cargando mercado...</div>
     </div>
 
-    <!-- Dashboard -->
-    <div class="container mt-5 mb-5">
-        <div class="row g-4">
-            <div class="col-12 col-md-4">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body text-center">
-                        <h5 class="card-title text-muted">Precio SFL</h5>
-                        <h2 class="text-success fw-bold">$0.102 <small class="fs-6 text-muted">USD</small></h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-md-4">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body">
-                        <h5 class="card-title text-muted text-center mb-3">Mercado de Recursos</h5>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">Madera <span class="badge bg-secondary rounded-pill">0.013 MATIC</span></li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">Piedra <span class="badge bg-secondary rounded-pill">0.027 MATIC</span></li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">Hierro <span class="badge bg-secondary rounded-pill">0.100 MATIC</span></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-md-4">
-                <div class="card h-100 shadow-sm border-0 bg-success text-white text-center">
-                    <div class="card-body d-flex flex-column justify-content-center">
-                        <i class="bi bi-calculator display-4 mb-2"></i>
-                        <h5>Calculadora de Cultivos</h5>
-                        <button class="btn btn-light mt-3 fw-bold text-success">Abrir</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- Bloque 2: Buscador de Granjas -->
+    <div class="card">
+        <h2>🚜 Buscar Granja</h2>
+        <p>Ingresa el Farm ID para ver quién es el dueño:</p>
+        <input type="number" id="farm-id" placeholder="Ejemplo: 123456">
+        <button onclick="buscarGranja()">Consultar</button>
+        <div id="info-granja" class="data-text"></div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
-    
     <script>
-        // Lógica Modo Oscuro
-        const btnSwitch = document.getElementById('btnSwitch');
-        btnSwitch.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-bs-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-bs-theme', newTheme);
-            btnSwitch.innerHTML = newTheme === 'dark' ? '<i class="bi bi-moon-fill"></i>' : '<i class="bi bi-brightness-high-fill text-warning"></i>';
-        });
-
-        // Lógica de conexión al Backend
-        async function go() {
-            var land_id = document.getElementById('land_id').value;
-            if (!land_id) return alert("Ingresa un ID");
-            
-            const btn = document.querySelector('.btn-success');
-            btn.innerText = 'Cargando...';
-            btn.disabled = true;
-
+        // --- 1. FUNCIÓN PARA EL PRECIO ---
+        async function obtenerPrecios() {
             try {
-                const scriptUrl = 'https://script.google.com/macros/s/AKfycbwhaBGd0-kiG6UtslWSdLhjXEVjFD-Tigr9wqOAXozeTZ8lTsZsLiFpHLB4Tp_tZyIg/exec?id=' + land_id;
-                const response = await fetch(scriptUrl);
-                const data = await response.json();
+                // Usamos la v1.1 que trae precios en USD
+                const respuesta = await fetch('https://sfl.world/api/v1.1/exchange');
+                const datos = await respuesta.json();
                 
-                console.log("Datos recibidos:", data);
-                alert("¡Conexión exitosa! Mira la consola (F12).");
+                // Extraemos el valor del SFL en USD
+                document.getElementById('precio-sfl').innerText = `1 SFL = $${datos.sfl.usd}`;
             } catch (error) {
-                console.error("Error:", error);
-                alert("Hubo un error al conectar.");
-            } finally {
-                btn.innerText = 'Revisar';
-                btn.disabled = false;
+                console.error("Fallo al traer el precio", error);
+                document.getElementById('precio-sfl').innerText = 'Error al conectar con SFL.world';
+                document.getElementById('precio-sfl').style.color = '#f87171'; // Rojo de error
             }
         }
+
+        // --- 2. FUNCIÓN PARA BUSCAR LA GRANJA ---
+        async function buscarGranja() {
+            const id = document.getElementById('farm-id').value;
+            const cuadroTexto = document.getElementById('info-granja');
+            
+            if (!id) {
+                cuadroTexto.innerText = "¡Epa! Escribe un ID primero.";
+                cuadroTexto.style.color = '#facc15';
+                return;
+            }
+
+            cuadroTexto.innerText = "Buscando en la blockchain...";
+            cuadroTexto.style.color = '#e0e0e0';
+
+            try {
+                // Consultamos la Land API específica para el Farm ID
+                const respuesta = await fetch(`https://sfl.world/api/v1/land/info/farm_id/${id}`);
+                
+                if (!respuesta.ok) throw new Error("Granja no encontrada");
+                
+                const datos = await respuesta.json();
+                
+                // Mostramos el nombre de usuario asociado a ese ID
+                cuadroTexto.innerText = `Username del dueño: ${datos.username}`;
+                cuadroTexto.style.color = '#4ade80';
+
+            } catch (error) {
+                console.error(error);
+                cuadroTexto.innerText = 'No se encontró la granja o el ID es inválido.';
+                cuadroTexto.style.color = '#f87171';
+            }
+        }
+
+        // --- 3. AUTO-EJECUCIÓN ---
+        // Llamamos a la función del precio apenas se abre la página
+        obtenerPrecios();
     </script>
 </body>
 </html>
