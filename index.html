@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es-419" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Herramientas SFL - Panel de Control</title>
+    
+    <!-- Bootstrap 5 CSS para el dise?o responsive -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons para los dibujitos (sol, luna, calculadora, etc) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <style>
+        /* Un toquecito de CSS personalizado para animar las tarjetas */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        }
+        .card { 
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s; 
+        }
+        .card:hover { 
+            transform: translateY(-5px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Barra de Navegaci車n (Navbar) -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm sticky-top">
+        <div class="container">
+            <a class="navbar-brand text-success fw-bold" href="#">
+                <i class="bi bi-brightness-alt-high-fill"></i> SFL Tools
+            </a>
+            <!-- Bot車n de hamburguesa para tel谷fonos -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link active" href="#">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Mercado</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Estad赤sticas</a></li>
+                </ul>
+                <!-- Bot車n de Modo Oscuro / Claro -->
+                <button id="btnSwitch" class="btn btn-outline-secondary rounded-circle">
+                    <i class="bi bi-moon-fill"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Secci車n Principal (Hero) -->
+    <div class="container mt-5 text-center">
+        <h1 class="display-4 fw-bold">Herramientas para Sunflower Land</h1>
+        <p class="lead text-muted">Consulta precios, analiza recursos y optimiza tu estrategia Web3.</p>
+        
+        <!-- Buscador de ID -->
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-6 col-sm-10">
+                <div class="input-group input-group-lg shadow-sm">
+                    <span class="input-group-text bg-success text-white">#</span>
+                    <!-- Tu ID de granja ya est芍 pre-cargado aqu赤 en el 'value' -->
+                    <input type="number" id="land_id" class="form-control" value="8749547546587388" placeholder="ID de la Granja">
+                    <button class="btn btn-success" type="button" onclick="go()">Revisar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel de Tarjetas (Dashboard) - Mobile-First -->
+    <div class="container mt-5 mb-5">
+        <!-- g-4 le da separaci車n a las tarjetas. En cel es 1 columna (col-12), en PC son 3 (col-md-4) -->
+        <div class="row g-4">
+            
+            <!-- Tarjeta 1: Precio del Token -->
+            <div class="col-12 col-md-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body text-center">
+                        <h5 class="card-title text-muted">Precio SFL</h5>
+                        <h2 class="text-success fw-bold">$0.102 <small class="fs-6 text-muted">USD</small></h2>
+                        <p class="text-success mb-0"><i class="bi bi-arrow-up-right"></i> +2.5% hoy</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 2: Lista de Recursos -->
+            <div class="col-12 col-md-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted text-center mb-3">Mercado de Recursos</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary-subtle">
+                                Madera <span class="badge bg-secondary rounded-pill">0.013 MATIC</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary-subtle">
+                                Piedra <span class="badge bg-secondary rounded-pill">0.027 MATIC</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary-subtle">
+                                Hierro <span class="badge bg-secondary rounded-pill">0.100 MATIC</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 3: Acceso a Calculadora -->
+            <div class="col-12 col-md-4">
+                <div class="card h-100 shadow-sm border-0 bg-success text-white">
+                    <div class="card-body text-center d-flex flex-column justify-content-center">
+                        <i class="bi bi-calculator display-4 mb-2"></i>
+                        <h5 class="card-title">Calculadora de Cultivos</h5>
+                        <p class="card-text">Descubre qu谷 semilla te da mejores ganancias hoy.</p>
+                        <button class="btn btn-light mt-auto fw-bold text-success">Abrir</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Scripts Esenciales -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    
+    <script>
+        // --- L車GICA DEL MODO OSCURO / CLARO ---
+        const btnSwitch = document.getElementById('btnSwitch');
+        const htmlElement = document.documentElement;
+
+        const savedTheme = Cookies.get('theme') || localStorage.getItem('theme') || 'dark';
+        htmlElement.setAttribute('data-bs-theme', savedTheme);
+        updateIcon(savedTheme);
+
+        btnSwitch.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            htmlElement.setAttribute('data-bs-theme', newTheme);
+            updateIcon(newTheme);
+            
+            Cookies.set('theme', newTheme, { expires: 365 });
+            localStorage.setItem('theme', newTheme);
+        });
+
+        function updateIcon(theme) {
+            if (theme === 'dark') {
+                btnSwitch.innerHTML = '<i class="bi bi-moon-fill"></i>';
+            } else {
+                btnSwitch.innerHTML = '<i class="bi bi-brightness-high-fill text-warning"></i>';
+            }
+        }
+
+        // --- L車GICA DE CONEXI車N CON TU APP SCRIPT (BACKEND) ---
+        async function go() {
+            var land_id = parseInt($('#land_id').val());
+            
+            if (land_id > 0) {
+                const btnRevisar = document.querySelector('.btn-success');
+                const textoOriginal = btnRevisar.innerText;
+                btnRevisar.innerText = 'Cargando...';
+                btnRevisar.disabled = true;
+
+                try {
+                    // Tu URL oficial de Google Apps Script
+                    const scriptUrl = 'https://script.google.com/macros/s/AKfycbwhaBGd0-kiG6UtslWSdLhjXEVjFD-Tigr9wqOAXozeTZ8lTsZsLiFpHLB4Tp_tZyIg/exec';
+                    
+                    const response = await fetch(scriptUrl);
+                    const data = await response.json();
+                    
+                    console.log("?Datos recibidos de tu granja!", data);
+                    alert("?Conexi車n exitosa! Presiona F12 para abrir la consola y ver la informaci車n de tu granja.");
+                    
+                } catch (error) {
+                    console.error("Error de conexi車n:", error);
+                    alert("Uy, hubo un error al conectar. Revisa la consola para m芍s detalles.");
+                } finally {
+                    btnRevisar.innerText = textoOriginal;
+                    btnRevisar.disabled = false;
+                }
+            } else {
+                alert("Por favor, ingresa un ID v芍lido.");
+            }
+        }
+
+        // Permitir buscar apretando la tecla 'Enter'
+        $('#land_id').on('keypress', function (e) {
+            if (e.which === 13) {
+                go();
+            }
+        });
+    </script>
+</body>
+</html>
