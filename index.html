@@ -66,36 +66,49 @@
                 <li>💎 <span id="gemas-granja"></span> Gems</li>
             </ul>
             <p style="color: #facc15; font-style: italic; margin-top: 15px;">
-                ¡Visita esta granja para limpiarla y apoyar a la comunidad!
+                ¡Únete a Sunflower Land, visita las granjas de la comunidad y ayuda a limpiarlas!
             </p>
         </div>
     </div>
 
     <script>
-        // Función inteligente para pasar la seguridad anti-bots envolviendo la respuesta
-        async function fetchSeguro(url) {
-            const proxy = 'https://api.allorigins.win/get?url=';
-            const respuesta = await fetch(proxy + encodeURIComponent(url));
-            
-            if (!respuesta.ok) throw new Error("El servidor proxy falló");
-            
-            const datosProxy = await respuesta.json();
-            
-            // Si SFL bloquea la petición, 'contents' vendrá nulo o con una página HTML de error
-            if (!datosProxy.contents) throw new Error("Bloqueo de seguridad de SFL.world");
-            
-            // Desenvolvemos los datos reales del juego
-            return JSON.parse(datosProxy.contents);
+        // Lista de proxys de respaldo
+        const proxys = [
+            'https://corsproxy.io/?',
+            'https://api.allorigins.win/raw?url=',
+            'https://api.codetabs.com/v1/proxy?quest='
+        ];
+
+        // Función que intenta conectar saltando de proxy en proxy si alguno falla
+        async function fetchResiliente(url) {
+            for (let proxy of proxys) {
+                try {
+                    // AllOrigins y CodeTabs necesitan la URL codificada, CorsProxy la prefiere cruda
+                    const urlFinal = proxy.includes('corsproxy.io') ? proxy + url : proxy + encodeURIComponent(url);
+                    
+                    const respuesta = await fetch(urlFinal);
+                    if (respuesta.ok) {
+                        const datos = await respuesta.json();
+                        // Si SFL bloquea la respuesta pero el proxy pasa, evitamos el error
+                        if (datos && !datos.error) {
+                            return datos;
+                        }
+                    }
+                } catch (e) {
+                    console.warn(`Falló el proxy: ${proxy}. Intentando con el siguiente...`);
+                }
+            }
+            throw new Error("Todos los servidores proxy están caídos o bloqueados.");
         }
 
         // 1. Obtener precio del SFL
         async function obtenerPrecios() {
             try {
-                const datos = await fetchSeguro('https://sfl.world/api/v1.1/exchange');
+                const datos = await fetchResiliente('https://sfl.world/api/v1.1/exchange');
                 document.getElementById('precio-sfl').innerText = `1 SFL = $${datos.sfl.usd}`;
             } catch (error) {
                 console.error("Fallo al traer el precio:", error);
-                document.getElementById('precio-sfl').innerText = 'Error al conectar con el mercado';
+                document.getElementById('precio-sfl').innerText = 'Mercado temporalmente fuera de línea';
                 document.getElementById('precio-sfl').style.color = '#f87171';
             }
         }
@@ -113,22 +126,22 @@
                 return;
             }
 
-            cuadroTexto.innerText = "Paso 1: Pasando cortafuegos de seguridad...";
+            cuadroTexto.innerText = "Conectando con la red...";
             cuadroTexto.style.color = '#e0e0e0';
             cajaDetalles.style.display = 'none';
 
             try {
-                // PASO 1: Conseguir el NFT ID
-                const datosId = await fetchSeguro(`https://sfl.world/api/v1/land/info/farm_id/${id}`);
+                // PASO 1: Conseguir el NFT ID usando el buscador de proxys
+                const datosId = await fetchResiliente(`https://sfl.world/api/v1/land/info/farm_id/${id}`);
                 
-                cuadroTexto.innerText = `Paso 2: Descargando datos de ${datosId.username}...`;
+                cuadroTexto.innerText = `Descargando datos de ${datosId.username}...`;
                 
-                // PASO 2: Conseguir los balances
-                const datos = await fetchSeguro(`https://sfl.world/api/v1.1/land/${datosId.nft_id}`);
+                // PASO 2: Conseguir los balances usando el buscador de proxys
+                const datos = await fetchResiliente(`https://sfl.world/api/v1.1/land/${datosId.nft_id}`);
 
-                console.log("Datos recibidos en Modo Seguro:", datos);
+                console.log("Datos exitosos:", datos);
 
-                // Llenar los datos en el HTML
+                // Llenar los datos
                 document.getElementById('lvl-bumpkin').innerText = datos.bumpkinLevel || 'N/A';
                 document.getElementById('expansion-granja').innerText = datos.expansion || 'N/A';
                 document.getElementById('isla-granja').innerText = datos.island || 'N/A';
@@ -142,14 +155,14 @@
                 cajaDetalles.style.display = 'block';
 
             } catch (error) {
-                console.error("Error detectado en la consulta:", error);
-                cuadroTexto.innerText = `Error: La API de SFL denegó el acceso (CORS/403).`;
+                console.error("Error definitivo:", error);
+                cuadroTexto.innerText = `Red congestionada. Intenta de nuevo en unos segundos.`;
                 cuadroTexto.style.color = '#f87171';
                 cajaDetalles.style.display = 'none';
             }
         }
 
-        // Auto-ejecutar el precio al cargar la página
+        // Ejecutar precio inicial
         obtenerPrecios();
     </script>
 </body>
