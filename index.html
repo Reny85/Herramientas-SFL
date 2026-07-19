@@ -1,112 +1,82 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Utilidades SFL - Reny</title>
-    <style>
-        /* Estilos básicos para que se vea como un tablero oscuro y moderno */
-        body { 
-            background-color: #121212; 
-            color: #e0e0e0; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            padding: 20px; 
-            max-width: 800px;
-            margin: auto;
-        }
-        h1 { color: #facc15; } /* Amarillo Sunflower */
-        .card { 
-            background: #1e1e1e; 
-            padding: 20px; 
-            margin-bottom: 20px; 
-            border-radius: 10px; 
-            border: 1px solid #333;
-        }
-        input, button { 
-            padding: 10px; 
-            margin-top: 10px; 
-            border-radius: 5px;
-            border: none;
-        }
-        input { background: #333; color: white; }
-        button { background: #facc15; color: #121212; font-weight: bold; cursor: pointer; }
-        button:hover { background: #eab308; }
-        .data-text { font-size: 1.2em; margin-top: 10px; color: #4ade80; } /* Verde para números */
-    </style>
-</head>
-<body>
-
-    <h1>Tablero de Estadísticas SFL</h1>
-
-    <!-- Bloque 1: Precio del Token -->
-    <div class="card">
-        <h2>💰 Economía</h2>
-        <p>Precio del SFL (Exchange API):</p>
-        <div id="precio-sfl" class="data-text">Cargando mercado...</div>
-    </div>
-
-    <!-- Bloque 2: Buscador de Granjas -->
+<!-- Bloque 2: Buscador de Granjas -->
     <div class="card">
         <h2>🚜 Buscar Granja</h2>
-        <p>Ingresa el Farm ID para ver quién es el dueño:</p>
-        <input type="number" id="farm-id" placeholder="Ejemplo: 123456">
+        <p>Ingresa el Farm ID para ver la información:</p>
+        <input type="number" id="farm-id" placeholder="Ejemplo: 8749547546587388">
         <button onclick="buscarGranja()">Consultar</button>
+        
         <div id="info-granja" class="data-text"></div>
+        
+        <!-- Detalles extra de la granja (Ocultos por defecto) -->
+        <div id="detalles-granja" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #333; color: #e0e0e0;">
+            <p><strong>Nivel del Bumpkin:</strong> <span id="lvl-bumpkin"></span></p>
+            <p><strong>Expansión Nº:</strong> <span id="expansion-granja"></span></p>
+            <p><strong>Isla:</strong> <span id="isla-granja"></span></p>
+            <p><strong>Balance:</strong></p>
+            <ul>
+                <li>🪙 <span id="monedas-granja"></span> Coins</li>
+                <li>💎 <span id="gemas-granja"></span> Gems</li>
+            </ul>
+            <p style="color: #facc15; font-style: italic; margin-top: 15px;">
+                ¡Visita esta granja para limpiarla y apoyar a la comunidad!
+            </p>
+        </div>
     </div>
 
     <script>
-        // --- 1. FUNCIÓN PARA EL PRECIO ---
-        async function obtenerPrecios() {
-            try {
-                // Usamos la v1.1 que trae precios en USD
-                const respuesta = await fetch('https://sfl.world/api/v1.1/exchange');
-                const datos = await respuesta.json();
-                
-                // Extraemos el valor del SFL en USD
-                document.getElementById('precio-sfl').innerText = `1 SFL = $${datos.sfl.usd}`;
-            } catch (error) {
-                console.error("Fallo al traer el precio", error);
-                document.getElementById('precio-sfl').innerText = 'Error al conectar con SFL.world';
-                document.getElementById('precio-sfl').style.color = '#f87171'; // Rojo de error
-            }
-        }
+        // ... (Mantén tu función obtenerPrecios() intacta arriba) ...
 
-        // --- 2. FUNCIÓN PARA BUSCAR LA GRANJA ---
         async function buscarGranja() {
             const id = document.getElementById('farm-id').value;
             const cuadroTexto = document.getElementById('info-granja');
+            const cajaDetalles = document.getElementById('detalles-granja');
             
             if (!id) {
                 cuadroTexto.innerText = "¡Epa! Escribe un ID primero.";
                 cuadroTexto.style.color = '#facc15';
+                cajaDetalles.style.display = 'none';
                 return;
             }
 
             cuadroTexto.innerText = "Buscando en la blockchain...";
             cuadroTexto.style.color = '#e0e0e0';
+            cajaDetalles.style.display = 'none';
 
             try {
-                // Consultamos la Land API específica para el Farm ID
+                // Consultamos la API con el ID
                 const respuesta = await fetch(`https://sfl.world/api/v1/land/info/farm_id/${id}`);
                 
                 if (!respuesta.ok) throw new Error("Granja no encontrada");
                 
                 const datos = await respuesta.json();
                 
-                // Mostramos el nombre de usuario asociado a ese ID
-                cuadroTexto.innerText = `Username del dueño: ${datos.username}`;
+                // Imprimimos todo en la consola para ver cómo viene la estructura exacta
+                console.log("Datos completos de la granja:", datos);
+                
+                // Mostramos el nombre
+                cuadroTexto.innerText = `Dueño: ${datos.username || 'Sin nombre'}`;
                 cuadroTexto.style.color = '#4ade80';
+
+                // Llenamos los detalles (los nombres de estas variables pueden variar 
+                // dependiendo de cómo las mande exactamente la API, revisa tu consola con F12)
+                document.getElementById('lvl-bumpkin').innerText = datos.bumpkinLevel || 'N/A';
+                document.getElementById('expansion-granja').innerText = datos.expansion || 'N/A';
+                document.getElementById('isla-granja').innerText = datos.island || 'N/A';
+                
+                // Manejo de balances (Asumiendo que vienen dentro de un objeto 'balance')
+                if(datos.balance) {
+                    document.getElementById('monedas-granja').innerText = datos.balance.coins || '0';
+                    document.getElementById('gemas-granja').innerText = datos.balance.gem || '0';
+                }
+
+                // Mostramos la caja con la información
+                cajaDetalles.style.display = 'block';
 
             } catch (error) {
                 console.error(error);
                 cuadroTexto.innerText = 'No se encontró la granja o el ID es inválido.';
                 cuadroTexto.style.color = '#f87171';
+                cajaDetalles.style.display = 'none';
             }
         }
-
-        // --- 3. AUTO-EJECUCIÓN ---
-        // Llamamos a la función del precio apenas se abre la página
-        obtenerPrecios();
     </script>
-</body>
-</html>
